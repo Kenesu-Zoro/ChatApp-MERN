@@ -3,6 +3,7 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { generateToken } from "../lib/utils.js";
+import cloudinary from "../lib/cloudinary.config.js";
 
 
 export const signup = async(req, res) => {
@@ -81,6 +82,7 @@ export const login = async(req, res) => {
             ...user._doc,
             password: undefined,
         })
+       
 
     } catch (error) {
         console.error("Error in Login Controller" +error);
@@ -99,5 +101,32 @@ export const logout = async(req, res) => {
 }
 
 export const updateProfile = async(req, res) => {
-    
+    try {
+        const {profilePic} = req.body;
+
+        const userId = req.user._id;
+
+        if(!profilePic){
+            return res.status(400).json({ message: "Please provide profile picture." });
+        }
+
+        const uploadResponse = await cloudinary.uploader.upload(profilePic)
+
+        const updatedUser = User.findByIdAndUpdate(userId, { profilePic: uploadResponse.secure_url }, { new: true });
+
+        res.status(200).json({ message: "Profile updated successfully", user: updatedUser });
+
+    } catch (error) {
+        console.error("Error in Update Profile Controller" +error);
+        res.status(500).json({ message: "Server error (updateProfile)" });
+    }
+}
+
+export const checkAuth = async(req, res) => {
+    try {
+        res.status(200).json({message: "check completed", user: req.user });
+    } catch (error) {
+        console.error("Error in Check Auth Controller" +error);
+        res.status(500).json({ message: "Server error (checkAuth)" });
+    }
 }
