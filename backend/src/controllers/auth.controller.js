@@ -41,6 +41,7 @@ export const signup = async(req, res) => {
             await newUser.save();
 
             res.status(201).json({
+                message: "User registered successfully",
                 _id: newUser._id,
                 email: newUser.email,
                 fullName: newUser.fullName,
@@ -76,10 +77,9 @@ export const login = async(req, res) => {
         generateToken(user._id, res);
 
         res.status(200).json({
-            _id: user._id,
-            email: user.email,
-            fullName: user.fullName,
-            profilePic: user.profilePic,
+            message: "Login successful",
+            ...user._doc,
+            password: undefined,
         })
 
     } catch (error) {
@@ -88,6 +88,16 @@ export const login = async(req, res) => {
     }
 }
 
-export const logout = (req, res) => {
-    res.send('Logout route');
+export const logout = async(req, res) => {
+    try {
+        res.cookie('jwtToken', '', {maxAge: 0});
+        res.status(200).json({ message: "Logged out successfully." });
+    } catch (error) {
+        console.error("Error in Logout Controller" +error);
+        res.status(500).json({ message: "Server error (logout)" });
+    }
+}
+
+export const updateProfile = async(req, res) => {
+    
 }
