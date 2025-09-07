@@ -9,7 +9,7 @@ export const protectedRoute = async (req, res, next) => {
     try {
         const token = req.cookies.jwtToken;
 
-        console.log('JWT Token from cookies:', token);
+        // console.log('JWT Token from cookies:', token);
 
         if (!token) {
             return res.status(401).json({ message: 'No token provided, authorization denied' });
