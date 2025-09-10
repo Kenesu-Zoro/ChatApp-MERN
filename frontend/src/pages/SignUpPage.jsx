@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
-import { useAuthStore } from '../store/useAuthStore'
+import { useAuthStore } from '../store/useAuthStore.js'
 import { Link } from 'react-router-dom'
 import { MessageSquare, User, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
 import AuthImagePattern from '../components/AuthImagePattern'
@@ -9,7 +9,7 @@ import toast from 'react-hot-toast'
 const SignUpPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
-        username: '',
+        fullName: '',
         email: '',
         password: '',
     });
@@ -28,7 +28,7 @@ const SignUpPage = () => {
     };
 
     const handleSubmit = (e) => {
-        e.preventDefualt();
+        e.preventDefault();
 
         const success = validateForm();
 
@@ -104,7 +104,7 @@ const SignUpPage = () => {
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
-                  className={`input input-bordered w-full pl-5`}
+                  className={`input input-bordered w-full pl-5 pr-10`}
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -115,7 +115,7 @@ const SignUpPage = () => {
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="size-5 text-base-content/40" />
+                    <EyeOff className="size-6 text-base-content/40" />
                   ) : (
                     <Eye className="size-5 text-base-content/40" />
                   )}
