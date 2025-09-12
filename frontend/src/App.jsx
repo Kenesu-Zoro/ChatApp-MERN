@@ -7,7 +7,7 @@ import SettingsPage from './pages/SettingsPage'
 import ProfilePage from './pages/ProfilePage'
 import { Routes , Route, Navigate} from 'react-router-dom'
 import {useAuthStore} from './store/useAuthStore.js'
-import { useThemeStorage } from './store/useThemeStorage.js'
+import { useThemeStore } from "./store/useThemeStorage.js" 
 import { useEffect } from 'react'
 import { Loader } from "lucide-react";
 import { Toaster } from 'react-hot-toast'
@@ -15,11 +15,19 @@ import { Toaster } from 'react-hot-toast'
 const App = () => {
 
 const {authUser , checkAuth , isCheckingAuth} = useAuthStore();
-const {theme} = useThemeStorage();
+const {theme} = useThemeStore();
 
 useEffect(() => {
   checkAuth();
 },[checkAuth])
+
+// in App.jsx (or a ThemeProvider)
+useEffect(() => {
+  const root = document.documentElement;
+  root.classList.remove('dark');            // prevent conflicts
+  root.setAttribute('data-theme', theme);   // apply DaisyUI theme
+}, [theme]);
+
 
 console.log("Auth User :" , authUser);
 
