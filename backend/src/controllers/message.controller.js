@@ -38,14 +38,14 @@ export const  getMessagesWithUser = async (req, res) => {
 
 export const sendMessagesToUser = async (req, res) => {
   try {
+      const {text, image} = req.body;
       const {id: receiverId} = req.params;
       const senderId = req.user._id;
   
-      const {text, image} = req.body;
 
-      if(!text && !image){
-        return res.status(400).json({ message: "Message text or image is required" });
-        }
+      // if(!text || !image){
+      //   return res.status(400).json({ message: "Message text or image is required" });
+      //   }
   
      let imageUrl = null;
   
