@@ -4,13 +4,21 @@ import { useEffect } from 'react'
 import MessageSkeleton from './skeleton/MessagesSkeleton.jsx'
 import ChatHeader from './ChatHeader.jsx'
 import MessageInput from './MessageInput.jsx'
+import { formatMessageTime } from '../lib/formatTime.js'
+import { useAuthStore } from '../store/useAuthStore.js'
 
 const ChatContainer = () => {
-    const {messages, getMessages, isMessagesLoading, selectedUser} = useChatStore();
+    const {messages, getMessages, isMessagesLoading, selectedUser, subscribeToMessages, unsubscribeFromMessages} = useChatStore();
+
+    const {authUser} = useAuthStore();
 
     useEffect(() => {
         getMessages(selectedUser._id);
-    }, [selectedUser._id, getMessages]);
+
+        subscribeToMessages();
+
+        return () => unsubscribeFromMessages();
+    }, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
     if (isMessagesLoading) {
     return (
@@ -22,12 +30,50 @@ const ChatContainer = () => {
     );
   }
 
-
   return (
-    <div>
-        <ChatHeader />
-        <p>Messages.......</p>
-        <MessageInput />
+   <div className="flex-1 flex flex-col overflow-auto">
+      <ChatHeader />
+
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message) => (
+          <div
+            key={message._id}
+            className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+          >
+            {/* avatar + time (moved time under avatar) */}
+            <div className="chat-image avatar flex flex-col items-center">
+              <div className="size-10 rounded-full border">
+                <img
+                  src={
+                    message.senderId === authUser._id
+                      ? authUser.profilePic || "/avatar.png"
+                      : selectedUser.profilePic || "/avatar.png"
+                  }
+                  alt="profile pic"
+                />
+              </div>
+              <time className="text-[10px] opacity-50 mt-1">
+                {formatMessageTime(message.createdAt)}
+              </time>
+            </div>
+
+            {/* removed the separate chat-header that previously held time */}
+
+            <div className="chat-bubble flex flex-col">
+              {message.image && (
+                <img
+                  src={message.image}
+                  alt="Attachment"
+                  className="sm:max-w-[200px] rounded-md mb-2"
+                />
+              )}
+              {message.text && <p>{message.text}</p>}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <MessageInput />
     </div>
   )
 }

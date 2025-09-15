@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import User from '../models/user.model.js';
 import Message from '../models/message.model.js';
 import cloudinary from '../lib/cloudinary.config.js';
+import { io,getRecieverSocketId  } from '../lib/socket.js';
 
 
 export const getUsersForSidebar = async (req, res) => {
@@ -41,7 +42,6 @@ export const sendMessagesToUser = async (req, res) => {
       const {text, image} = req.body;
       const {id: receiverId} = req.params;
       const senderId = req.user._id;
-  
 
       // if(!text || !image){
       //   return res.status(400).json({ message: "Message text or image is required" });
@@ -69,6 +69,11 @@ export const sendMessagesToUser = async (req, res) => {
      await newMessage.save();
      
      // realtime function with socket.io will go here
+
+     const receiverSocketId = getRecieverSocketId(receiverId);
+     if(receiverSocketId){
+        io.to(receiverSocketId).emit("newMessage", newMessage);
+     }
 
     res.status(201).json(newMessage);
 
